@@ -8,6 +8,7 @@ public class Physics : MonoBehaviour {
 
     [SerializeField] private float health = 100f;
     [SerializeField] private float speed;
+    [SerializeField] private float forceJump;
     private Animator animator;
     private Rigidbody rigibody;    
 
@@ -53,7 +54,7 @@ public class Physics : MonoBehaviour {
         float moveVertical = joystick.Vertical;
 
         if (moveVertical >= 0.5f)
-        {
+        {            
             animator.SetTrigger("IsJumping");
         }
 
