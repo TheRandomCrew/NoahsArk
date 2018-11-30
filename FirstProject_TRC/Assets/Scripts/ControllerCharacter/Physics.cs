@@ -5,28 +5,33 @@ using UnityEngine;
 public class Physics : MonoBehaviour {
         
     public Joystick joystick;
+    public GameObject ModelCharacter;
 
     [SerializeField] private float health = 100f;
     [SerializeField] private float speed;
-    [SerializeField] private float forceJump;
+    [SerializeField] private float gravity = 20f;
+    [SerializeField] private float forceJump = 100f;
+
+
+    private Vector3 Movement;
     private Animator animator;
-    private Rigidbody rigibody;    
+    private CharacterController characterController;
+   
 
     private void Awake()
     {
-        rigibody = GetComponent<Rigidbody>();
-        animator = GetComponent<Animator>();
+        characterController = GetComponent<CharacterController>();
+        animator = ModelCharacter.GetComponent<Animator>();
     }
 
     private void FixedUpdate()
     {
-
         //Physics Movement in axis x
         float moveHorizontal = joystick.Horizontal;
 
         if (moveHorizontal != 0)
         {
-            gameObject.transform.localScale = new Vector3(1f, 1f, 1f*(Mathf.Sign(moveHorizontal)));
+            ModelCharacter.transform.localScale = new Vector3(ModelCharacter.transform.localScale.x, ModelCharacter.transform.localScale.y, 1f * (Mathf.Sign(moveHorizontal)));
 
             if (Mathf.Abs(moveHorizontal) < 0.4f)
             {
@@ -47,16 +52,15 @@ public class Physics : MonoBehaviour {
             speed = 0;
         }
 
-        Vector3 movement = new Vector3(moveHorizontal, 0f, 0f);
-        rigibody.velocity = movement * speed;
+        Movement = new Vector3 (speed * moveHorizontal, -gravity, 0f);        
+        characterController.Move(Movement * Time.deltaTime);
+    }
 
-        //Physics Movement in axis x
-        float moveVertical = joystick.Vertical;
-
-        if (moveVertical >= 0.5f)
-        {            
-            animator.SetTrigger("IsJumping");
-        }
-
+    public void Jump()
+    {
+        animator.SetTrigger("IsJumping");
+        Movement = new Vector3(0f, forceJump, 0f);
+        characterController.Move(Movement * Time.deltaTime);
+        
     }
 }
