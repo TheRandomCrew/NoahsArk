@@ -11,6 +11,7 @@ public class Physics : MonoBehaviour {
     [SerializeField] private float speed;
     [SerializeField] private float gravity = 20f;
     [SerializeField] private float forceJump = 100f;
+    [SerializeField] private bool IsGround;
 
 
     private Vector3 Movement;
@@ -26,34 +27,40 @@ public class Physics : MonoBehaviour {
 
     private void FixedUpdate()
     {
-        //Physics Movement in axis x
-        float moveHorizontal = joystick.Horizontal;
-
-        if (moveHorizontal != 0)
+        if (IsGround)
         {
-            ModelCharacter.transform.localScale = new Vector3(ModelCharacter.transform.localScale.x, ModelCharacter.transform.localScale.y, 1f * (Mathf.Sign(moveHorizontal)));
+            //Physics Movement in axis x
+            float moveHorizontal = joystick.Horizontal;
 
-            if (Mathf.Abs(moveHorizontal) < 0.4f)
+            if (moveHorizontal != 0)
             {
-                animator.SetBool("IsWalking", true);
-                animator.SetBool("IsRunning", false);
-                speed = 2f;
-            } else
+                ModelCharacter.transform.localScale = new Vector3(ModelCharacter.transform.localScale.x, ModelCharacter.transform.localScale.y, 1f * (Mathf.Sign(moveHorizontal)));
+
+                if (Mathf.Abs(moveHorizontal) < 0.4f)
+                {
+                    animator.SetBool("IsWalking", true);
+                    animator.SetBool("IsRunning", false);
+                    speed = 2f;
+                }
+                else
+                {
+                    animator.SetBool("IsRunning", true);
+                    animator.SetBool("IsWalking", false);
+                    speed = 8f;
+                }
+
+            }
+            else
             {
-                animator.SetBool("IsRunning", true);
                 animator.SetBool("IsWalking", false);
-                speed = 8f;
-            }           
+                animator.SetBool("IsRunning", false);
+                speed = 0;
+            }
 
-        } else
-        {
-            animator.SetBool("IsWalking", false);
-            animator.SetBool("IsRunning", false);
-            speed = 0;
+            Movement = new Vector3(speed * moveHorizontal, -gravity, 0f);
+            characterController.Move(Movement * Time.deltaTime);
         }
-
-        Movement = new Vector3 (speed * moveHorizontal, -gravity, 0f);        
-        characterController.Move(Movement * Time.deltaTime);
+        
     }
 
     public void Jump()
@@ -63,4 +70,6 @@ public class Physics : MonoBehaviour {
         characterController.Move(Movement * Time.deltaTime);
         
     }
+
+    
 }
